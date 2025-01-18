@@ -1283,7 +1283,7 @@ select.popup-input {
 .mobile-menu-content .menu-button {
     justify-content: flex-start;
     width: 100%;
-    padding: 12px;
+    padding: 1px;
     gap: 10px;
 }
 
