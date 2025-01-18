@@ -15,6 +15,13 @@ body {
     position: relative;
 }
 
+#map {
+    flex: 1;
+    height: calc(100vh - 60px);
+    margin-top: 60px;
+    z-index: 1;
+}
+
 .menubar {
     position: fixed;
     top: 0;
@@ -59,20 +66,19 @@ body {
 .menu-group {
     display: flex;
     gap: 10px;
-    align-items: center;
 }
 
 .menu-button {
-    background: none;
+    background-color: transparent;
     border: none;
     color: white;
-    padding: 8px;
+    padding: 8px 12px;
     cursor: pointer;
     border-radius: 4px;
     transition: background-color 0.3s;
     display: flex;
     align-items: center;
-    justify-content: center;
+    gap: 5px;
 }
 
 .menu-button:hover {
@@ -80,178 +86,202 @@ body {
 }
 
 .menu-button i {
-    font-size: 18px;
-}
-
-#logout-btn {
-    background-color: rgba(255, 255, 255, 0.1);
-    border: none;
-    color: white;
-    padding: 8px 16px;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-    font-weight: bold;
-}
-
-#logout-btn:hover {
-    background-color: rgba(255, 255, 255, 0.2);
-}
-
-/* Ajuste para o título da seção */
-.tools h3 {
-    margin: 0 0 10px 0;
-    color: #333;
     font-size: 16px;
 }
 
-.menu-btn {
-    position: fixed;
-    top: 10px;
-    left: 10px;
-    z-index: 1001;
-    background-color: white;
+#logout-btn {
+    background-color: #e74c3c;
+    color: white;
     border: none;
+    padding: 8px 16px;
     border-radius: 4px;
-    padding: 10px;
     cursor: pointer;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-    display: flex;
-    align-items: center;
-    justify-content: center;
     transition: background-color 0.3s;
 }
 
-.menu-btn:hover {
-    background-color: #f0f0f0;
+#logout-btn:hover {
+    background-color: #c0392b;
 }
 
-.menu-btn i {
-    font-size: 20px;
-    color: #333;
-}
-
-.sidebar {
+.marker-customization {
     position: fixed;
-    top: 0;
-    left: 0;
-    height: 100vh;
-    width: 300px;
-    background-color: #fff;
-    box-shadow: 2px 0 5px rgba(0,0,0,0.1);
-    z-index: 1000;
-    transform: translateX(-100%);
-    transition: transform 0.3s ease;
-    display: flex;
-    flex-direction: column;
-}
-
-.sidebar.active {
-    transform: translateX(0);
-}
-
-.sidebar-header {
-    padding: 15px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-bottom: 1px solid #eee;
-    flex-shrink: 0;
-}
-
-.sidebar-content {
-    padding: 15px;
-    flex-grow: 1;
-    overflow-y: auto;
-    overflow-x: hidden;
-    scrollbar-width: thin;
-    scrollbar-color: #888 #f1f1f1;
-}
-
-.sidebar-content::-webkit-scrollbar {
-    width: 8px;
-}
-
-.sidebar-content::-webkit-scrollbar-track {
-    background: #f1f1f1;
-}
-
-.sidebar-content::-webkit-scrollbar-thumb {
-    background: #888;
-    border-radius: 4px;
-}
-
-.sidebar-content::-webkit-scrollbar-thumb:hover {
-    background: #555;
-}
-
-.sidebar-logo {
-    width: 180px;
-    height: auto;
-    object-fit: contain;
-    mix-blend-mode: multiply;
-}
-
-.sidebar-header h2 {
-    margin: 0;
-    font-size: 20px;
-    flex-grow: 1;
-    color: #333;
-}
-
-.close-menu {
-    position: absolute;
-    right: 10px;
     top: 50%;
-    transform: translateY(-50%);
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    z-index: 2000;
+    display: none;
+    width: 90%;
+    max-width: 400px;
+}
+
+.marker-customization.active {
+    display: block;
+}
+
+.close-customization-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
     background: none;
     border: none;
-    font-size: 20px;
+    font-size: 24px;
     cursor: pointer;
     color: #666;
-    padding: 5px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
 }
 
-.close-menu:hover {
+.close-customization-btn:hover {
     color: #333;
 }
 
-.search-box {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
+.customization-content {
+    margin-top: 20px;
 }
 
-.search-box input {
+.map-select {
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #fff;
+    color: #333;
+    font-size: 14px;
+    cursor: pointer;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+.map-select:hover {
+    border-color: #666;
+}
+
+.map-select:focus {
+    border-color: #2196F3;
+    box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2);
+}
+
+/* Estilos para o formulário de marcador */
+.marker-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.form-group label {
+    font-weight: bold;
+    color: #333;
+}
+
+.popup-input {
     padding: 8px;
     border: 1px solid #ddd;
     border-radius: 4px;
+    font-size: 14px;
 }
 
-button {
+.popup-input:focus {
+    border-color: #2196F3;
+    outline: none;
+}
+
+.popup-btn {
     padding: 8px 16px;
-    background-color: #4CAF50;
-    color: white;
     border: none;
     border-radius: 4px;
     cursor: pointer;
+    font-weight: bold;
     transition: background-color 0.3s;
 }
 
-button:hover {
+.save-btn {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.save-btn:hover {
     background-color: #45a049;
 }
 
-#map {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100vh;
-    z-index: 1;
+.cancel-btn {
+    background-color: #f44336;
+    color: white;
+}
+
+.cancel-btn:hover {
+    background-color: #da190b;
+}
+
+textarea.popup-input {
+    min-height: 80px;
+    resize: vertical;
+}
+
+/* Media Queries para dispositivos móveis */
+@media screen and (max-width: 768px) {
+    .menubar {
+        height: auto;
+        padding: 10px;
+        flex-direction: column;
+    }
+
+    .menubar-left {
+        width: 100%;
+        justify-content: center;
+        margin-bottom: 10px;
+    }
+
+    .menubar-center {
+        width: 100%;
+        margin: 10px 0;
+    }
+
+    .menubar-right {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .menu-group {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .menu-button {
+        padding: 8px;
+        font-size: 14px;
+    }
+
+    .logo {
+        max-height: 30px;
+    }
+
+    #map {
+        height: calc(100vh - 120px);
+        margin-top: 120px;
+    }
+
+    .marker-customization {
+        width: 90%;
+        max-width: none;
+        left: 5%;
+        right: 5%;
+        transform: translateY(-50%);
+    }
+
+    .map-select {
+        width: 100%;
+        max-width: 200px;
+        margin: 5px 0;
+    }
 }
 
 .layers-control, .tools {
@@ -305,7 +335,6 @@ h3 {
     display: flex;
     align-items: center;
     justify-content: center;
-    text-align: center;
 }
 
 .location-marker div {
@@ -482,82 +511,6 @@ select.marker-input {
     background-color: #1976D2;
 }
 
-.sidebar-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    z-index: 999;
-    display: none;
-}
-
-.sidebar-overlay.active {
-    display: block;
-}
-
-/* Estilos específicos para mobile */
-@media (max-width: 768px) {
-    .sidebar {
-        position: fixed;
-        left: -100%;
-        top: 0;
-        height: 100%;
-        width: 80%;
-        max-width: 300px;
-        background: white;
-        transition: left 0.3s ease;
-        z-index: 1000;
-        box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-    }
-
-    .sidebar.active {
-        left: 0;
-    }
-
-    .menu-btn {
-        display: block;
-        position: fixed;
-        left: 10px;
-        top: 10px;
-        z-index: 999;
-        background: white;
-        border: none;
-        padding: 10px;
-        border-radius: 4px;
-        cursor: pointer;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-    }
-
-    .menu-btn i {
-        font-size: 24px;
-        color: #333;
-    }
-
-    .close-menu {
-        display: flex;
-    }
-
-    #map {
-        width: 100%;
-        margin-left: 0;
-    }
-}
-
-@keyframes pulse {
-    0% {
-        box-shadow: 0 0 0 0 rgba(33, 150, 243, 0.4);
-    }
-    70% {
-        box-shadow: 0 0 0 10px rgba(33, 150, 243, 0);
-    }
-    100% {
-        box-shadow: 0 0 0 0 rgba(33, 150, 243, 0);
-    }
-}
-
-/* Estilos para o popup de edição */
 .marker-edit-popup {
     padding: 10px;
 }
@@ -635,7 +588,6 @@ textarea.popup-input {
     background-color: #1976D2;
 }
 
-/* Prévia do marcador */
 .marker-preview {
     width: 40px;
     height: 40px;
@@ -1098,4 +1050,99 @@ select.popup-input {
 
 .marker-form select option {
     padding: 8px;
+}
+
+/* Media Queries para dispositivos móveis */
+@media screen and (max-width: 768px) {
+    .menubar {
+        height: auto;
+        padding: 10px;
+        flex-direction: column;
+    }
+
+    .menubar-left {
+        width: 100%;
+        justify-content: center;
+        margin-bottom: 10px;
+    }
+
+    .menubar-center {
+        width: 100%;
+        margin: 10px 0;
+    }
+
+    .menubar-right {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .menu-group {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .menu-button {
+        padding: 8px;
+        font-size: 14px;
+    }
+
+    .logo {
+        max-height: 30px;
+    }
+
+    #map {
+        height: calc(100vh - 120px) !important;
+        margin-top: 120px !important;
+    }
+
+    .marker-customization {
+        width: 90%;
+        max-width: none;
+        left: 5%;
+        right: 5%;
+    }
+}
+
+.map-select {
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #fff;
+    color: #333;
+    font-size: 14px;
+    cursor: pointer;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+.map-select:hover {
+    border-color: #666;
+}
+
+.map-select:focus {
+    border-color: #2196F3;
+    box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2);
+}
+
+/* Estilo para dispositivos móveis */
+@media screen and (max-width: 768px) {
+    .map-select {
+        width: 100%;
+        max-width: 200px;
+        margin: 5px 0;
+    }
+}
+
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(33, 150, 243, 0.4);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(33, 150, 243, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(33, 150, 243, 0);
+    }
 }

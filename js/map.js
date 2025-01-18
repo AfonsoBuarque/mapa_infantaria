@@ -1,6 +1,27 @@
 // Variável global para o mapa e camadas
 let map;
 let drawnItems;
+let currentBaseLayer;
+
+// Definição das camadas de mapa
+const mapLayers = {
+    osm: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: ' OpenStreetMap contributors'
+    }),
+    satellite: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+        maxZoom: 19,
+        attribution: ' Esri'
+    }),
+    terrain: L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/terrain/{z}/{x}/{y}.jpg', {
+        maxZoom: 18,
+        attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>'
+    }),
+    dark: L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/dark_all/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: ' CartoDB'
+    })
+};
 
 // Função para editar marcador
 window.editMarker = function(markerId) {
@@ -91,10 +112,8 @@ function initMap() {
     window.map = map;
 
     // Adiciona a camada base inicial do OpenStreetMap
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-        attribution: ' OpenStreetMap contributors'
-    }).addTo(map);
+    currentBaseLayer = mapLayers.osm;
+    currentBaseLayer.addTo(map);
 
     // Camadas para desenhos
     drawnItems = new L.FeatureGroup();
@@ -169,47 +188,29 @@ function initMap() {
         }
     });
 
+    // Configura o seletor de tipo de mapa
+    const mapTypeSelect = document.getElementById('map-type');
+    if (mapTypeSelect) {
+        mapTypeSelect.addEventListener('change', function() {
+            const selectedType = this.value;
+            
+            // Remove a camada atual
+            if (currentBaseLayer) {
+                map.removeLayer(currentBaseLayer);
+            }
+            
+            // Adiciona a nova camada
+            currentBaseLayer = mapLayers[selectedType];
+            currentBaseLayer.addTo(map);
+        });
+    }
+
     // Dispara evento de inicialização do mapa
     document.dispatchEvent(new Event('map:init'));
 }
 
 // Aguarda o DOM estar pronto para inicializar o mapa
 document.addEventListener('DOMContentLoaded', initMap);
-
-// Definição das camadas de mapa
-const mapLayers = {
-    streets: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: ' OpenStreetMap contributors'
-    }),
-    satellite: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-        attribution: ' Esri'
-    }),
-    terrain: L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
-        attribution: ' OpenTopoMap'
-    }),
-    hybrid: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-        attribution: ' Esri'
-    }),
-    labels: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: ' OpenStreetMap contributors',
-        opacity: 0.5
-    })
-};
-
-// Adiciona as camadas base ao gerenciador
-Object.entries(mapLayers).forEach(([name, layer]) => {
-    if (window.layerManager) {
-        window.layerManager.addBaseLayer(name, layer);
-    }
-});
-
-// Evento para salvar os itens desenhados
-document.addEventListener('map:init', function () {
-    map.on(L.Draw.Event.CREATED, function (e) {
-        const layer = e.layer;
-        drawnItems.addLayer(layer);
-    });
-});
 
 // Estado do modo de desenho
 let drawingMode = false;

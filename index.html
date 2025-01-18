@@ -30,6 +30,12 @@
                 <!-- Ferramentas -->
                 <div class="tools">
                     <div class="menu-group">
+                        <select id="map-type" class="map-select" title="Tipo de Mapa">
+                            <option value="osm">OpenStreetMap</option>
+                            <option value="satellite">Satélite</option>
+                            <option value="terrain">Terreno</option>
+                            <option value="dark">Escuro</option>
+                        </select>
                         <button id="toggle-draw" class="menu-button" title="Adicionar Marcador">
                             <i class="fas fa-map-marker-alt"></i>
                         </button>
@@ -76,15 +82,7 @@
             </div>
             <div class="sidebar-content">
                 <!-- Controles de Camadas -->
-                <div class="layers-control">
-                    <h3>Tipo de Mapa</h3>
-                    <select id="map-type-select">
-                        <option value="streets">Ruas</option>
-                        <option value="satellite">Satélite</option>
-                        <option value="terrain">Terreno</option>
-                        <option value="hybrid">Híbrido</option>
-                    </select>
-                </div>
+
 
                 <!-- Personalização de Marcadores -->
                 <div class="marker-customization">
