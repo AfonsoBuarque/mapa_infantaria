@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mapa Infantaria</title>
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    
+    <div class="container">
+        <div id="map"></div>
+        
+        <!-- Menubar -->
+        <div class="menubar">
+            <div class="menubar-left">
+                <img src="https://i.postimg.cc/G3yKy72D/feliznatal-logo.png" alt="Logo" class="logo">
+            </div>
+            
+            <div class="menubar-center">
+                <!-- Ferramentas -->
+                <div class="tools">
+                    <div class="menu-group">
+                        <button id="toggle-draw" class="menu-button" title="Adicionar Marcador">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </button>
+                        <button id="list-markers" class="menu-button" title="Listar Marcações">
+                            <i class="fas fa-list"></i>
+                        </button>
+                        <button id="import-kml" class="menu-button" title="Importar KML">
+                            <i class="fas fa-file-import"></i>
+                        </button>
+                        <button id="export-kml" class="menu-button" title="Exportar KML">
+                            <i class="fas fa-file-export"></i>
+                        </button>
+                        <input type="file" id="kml-file-input" accept=".kml" style="display: none;">
+                        <button id="location-btn" class="menu-button" title="Minha Localização">
+                            <i class="fas fa-location-arrow"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Coordenadas -->
+                <div class="coordinates">
+                    <div class="menu-group">
+                        <input type="number" id="lat" placeholder="Latitude" step="any" class="coord-input">
+                        <input type="number" id="lng" placeholder="Longitude" step="any" class="coord-input">
+                        <button id="search-coord-btn" class="menu-button" title="Buscar Coordenadas">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="menubar-right">
+                <button id="logout-btn">Sair</button>
+            </div>
+        </div>
+        
+        <div class="sidebar-overlay" id="sidebar-overlay"></div>
+        
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <button class="close-menu" id="close-menu">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="sidebar-content">
+                <!-- Controles de Camadas -->
+                <div class="layers-control">
+                    <h3>Tipo de Mapa</h3>
+                    <select id="map-type-select">
+                        <option value="streets">Ruas</option>
+                        <option value="satellite">Satélite</option>
+                        <option value="terrain">Terreno</option>
+                        <option value="hybrid">Híbrido</option>
+                    </select>
+                </div>
+
+                <!-- Personalização de Marcadores -->
+                <div class="marker-customization">
+                    <div class="marker-customization-header">
+                        <h3>Personalizar Marcador</h3>
+                        <button class="close-customization-btn" title="Fechar">×</button>
+                    </div>
+                    <div class="marker-form">
+                        <div class="form-group">
+                            <label for="marker-title">Título:</label>
+                            <input type="text" id="marker-title" placeholder="Nome do marcador">
+                        </div>
+                        <div class="form-group">
+                            <label for="marker-description">Descrição:</label>
+                            <textarea id="marker-description" placeholder="Descrição do marcador"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="marker-color">Cor:</label>
+                            <input type="color" id="marker-color" value="#ff0000">
+                        </div>
+                        <div class="form-group">
+                            <label for="marker-icon">Ícone:</label>
+                            <select id="marker-icon">
+                                <option value="📍">📍 Marcador</option>
+                                <option value="🎯">🎯 Alvo</option>
+                                <option value="⭐">⭐ Estrela</option>
+                                <option value="🚩">🚩 Bandeira</option>
+                                <option value="🏁">🏁 Chegada</option>
+                                <option value="💎">💎 Diamante</option>
+                                <option value="🔥">🔥 Fogo</option>
+                                <option value="⚡">⚡ Raio</option>
+                                <option value="❗">❗ Atenção</option>
+                                <option value="🔍">🔍 Busca</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
+    
+    <!-- Custom JS -->
+    <script src="js/map.js"></script>
+    <script src="js/markers.js"></script>
+    <script src="js/markers-list.js"></script>
+    <script src="js/kml-import.js"></script>
+    <script src="js/kml-export.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/draw.js"></script>
+    <script src="js/tools.js"></script>
+    <script src="js/menu.js"></script>
+    <script src="js/layers.js"></script>
+
+    <script>
+        // Verifica autenticação
+        firebase.auth().onAuthStateChanged(function(user) {
+            if (!user) {
+                // Usuário não está logado, redireciona para a página de login
+                window.location.href = 'login.html';
+            }
+        });
+
+        // Logout
+        document.getElementById('logout-btn').addEventListener('click', function() {
+            firebase.auth().signOut().then(() => {
+                window.location.href = 'login.html';
+            });
+        });
+    </script>
+</body>
+</html>
