@@ -1241,6 +1241,26 @@ select.popup-input {
     padding: 20px;
     border-top: 1px solid rgba(255,255,255,0.1);
     margin-top: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    align-items: center;
+}
+
+.developer-credits {
+    text-align: center;
+    margin-top: 10px;
+}
+
+.developer-credits a {
+    color: rgba(255,255,255,0.7);
+    text-decoration: none;
+    font-size: 12px;
+    transition: color 0.3s ease;
+}
+
+.developer-credits a:hover {
+    color: white;
 }
 
 .mobile-menu-overlay {
@@ -1290,4 +1310,24 @@ select.popup-input {
 .mobile-button-text {
     font-size: 14px;
     white-space: nowrap;
+}
+
+.copyright {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: rgba(44, 62, 80, 0.9);
+    color: white;
+    text-align: center;
+    padding: 5px;
+    font-size: 12px;
+    z-index: 1000;
+}
+
+@media screen and (max-width: 768px) {
+    .copyright {
+        font-size: 10px;
+        padding: 3px;
+    }
 }
