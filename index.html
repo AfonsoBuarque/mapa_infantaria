@@ -23,18 +23,22 @@
         <!-- Menubar -->
         <div class="menubar">
             <div class="menubar-left">
-                <img src="https://i.postimg.cc/G3yKy72D/feliznatal-logo.png" alt="Logo" class="logo">
+                <button id="mobile-menu-btn" class="mobile-menu-btn">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="logo-container">
+                    <img src="https://i.postimg.cc/G3yKy72D/feliznatal-logo.png" alt="Logo" class="logo">
+                    <span class="team-name">Infantaria Team</span>
+                </div>
             </div>
             
-            <div class="menubar-center">
+            <div class="menubar-center desktop-only">
                 <!-- Ferramentas -->
                 <div class="tools">
                     <div class="menu-group">
                         <select id="map-type" class="map-select" title="Tipo de Mapa">
                             <option value="osm">OpenStreetMap</option>
                             <option value="satellite">Satélite</option>
-                            <option value="terrain">Terreno</option>
-                            <option value="dark">Escuro</option>
                         </select>
                         <button id="toggle-draw" class="menu-button" title="Adicionar Marcador">
                             <i class="fas fa-map-marker-alt"></i>
@@ -72,6 +76,67 @@
             </div>
         </div>
         
+        <!-- Menu Mobile -->
+        <div class="mobile-menu">
+            <div class="mobile-menu-header">
+                <div class="logo-container">
+                    <img src="https://i.postimg.cc/G3yKy72D/feliznatal-logo.png" alt="Logo" class="logo">
+                    <span class="team-name">Infantaria Team</span>
+                </div>
+                <button class="mobile-menu-close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="mobile-menu-content">
+                <!-- Ferramentas -->
+                <div class="tools">
+                    <div class="menu-group">
+                        <select id="map-type-mobile" class="map-select" title="Tipo de Mapa">
+                            <option value="osm">OpenStreetMap</option>
+                            <option value="satellite">Satélite</option>
+                        </select>
+                        <button id="toggle-draw-mobile" class="menu-button" title="Adicionar Marcador">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span class="mobile-button-text">Adicionar Marcador</span>
+                        </button>
+                        <button id="list-markers-mobile" class="menu-button" title="Listar Marcações">
+                            <i class="fas fa-list"></i>
+                            <span class="mobile-button-text">Listar Marcações</span>
+                        </button>
+                        <button id="import-kml-mobile" class="menu-button" title="Importar KML">
+                            <i class="fas fa-file-import"></i>
+                            <span class="mobile-button-text">Importar KML</span>
+                        </button>
+                        <button id="export-kml-mobile" class="menu-button" title="Exportar KML">
+                            <i class="fas fa-file-export"></i>
+                            <span class="mobile-button-text">Exportar KML</span>
+                        </button>
+                        <button id="location-btn-mobile" class="menu-button" title="Minha Localização">
+                            <i class="fas fa-location-arrow"></i>
+                            <span class="mobile-button-text">Minha Localização</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Coordenadas -->
+                <div class="coordinates">
+                    <div class="menu-group">
+                        <input type="number" id="lat-mobile" placeholder="Latitude" step="any" class="coord-input">
+                        <input type="number" id="lng-mobile" placeholder="Longitude" step="any" class="coord-input">
+                        <button id="search-coord-btn-mobile" class="menu-button" title="Buscar Coordenadas">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Logout -->
+                <div class="mobile-menu-footer">
+                    <button id="logout-btn-mobile" class="logout-btn">Sair</button>
+                </div>
+            </div>
+        </div>
+        
         <div class="sidebar-overlay" id="sidebar-overlay"></div>
         
         <div class="sidebar" id="sidebar">
@@ -82,7 +147,6 @@
             </div>
             <div class="sidebar-content">
                 <!-- Controles de Camadas -->
-
 
                 <!-- Personalização de Marcadores -->
                 <div class="marker-customization">

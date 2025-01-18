@@ -44,6 +44,24 @@ body {
     gap: 20px;
 }
 
+.logo-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.team-name {
+    color: white;
+    font-size: 18px;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.logo {
+    height: 40px;
+    width: auto;
+}
+
 .menubar-center {
     display: flex;
     align-items: center;
@@ -56,11 +74,6 @@ body {
     display: flex;
     align-items: center;
     gap: 20px;
-}
-
-.logo {
-    height: 40px;
-    width: auto;
 }
 
 .menu-group {
@@ -228,59 +241,63 @@ textarea.popup-input {
 @media screen and (max-width: 768px) {
     .menubar {
         height: auto;
-        padding: 10px;
         flex-direction: column;
-    }
-
-    .menubar-left {
-        width: 100%;
-        justify-content: center;
-        margin-bottom: 10px;
-    }
-
-    .menubar-center {
-        width: 100%;
-        margin: 10px 0;
-    }
-
-    .menubar-right {
-        width: 100%;
-        justify-content: center;
-    }
-
-    .menu-group {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
+        padding: 10px;
         gap: 10px;
     }
 
-    .menu-button {
-        padding: 8px;
-        font-size: 14px;
+    .menubar-center {
+        flex-direction: column;
+        width: 100%;
     }
 
-    .logo {
-        max-height: 30px;
+    .tools, .coordinates {
+        width: 100%;
+    }
+
+    .menu-group {
+        flex-wrap: wrap;
+        justify-content: center;
+        width: 100%;
+    }
+
+    .coord-input {
+        width: 100%;
+        max-width: 150px;
     }
 
     #map {
-        height: calc(100vh - 120px);
-        margin-top: 120px;
+        height: calc(100vh - 140px);
+        margin-top: 140px;
     }
 
-    .marker-customization {
-        width: 90%;
-        max-width: none;
-        left: 5%;
-        right: 5%;
-        transform: translateY(-50%);
-    }
-
-    .map-select {
+    .menubar-left, .menubar-right {
         width: 100%;
-        max-width: 200px;
-        margin: 5px 0;
+        justify-content: center;
+    }
+}
+
+/* Para telas ainda menores */
+@media screen and (max-width: 480px) {
+    .menubar {
+        padding: 5px;
+    }
+
+    .menu-button {
+        padding: 6px 8px;
+    }
+
+    .logo {
+        height: 30px;
+    }
+
+    #map {
+        height: calc(100vh - 160px);
+        margin-top: 160px;
+    }
+
+    .team-name {
+        font-size: 16px;
     }
 }
 
@@ -1093,8 +1110,8 @@ select.popup-input {
     }
 
     #map {
-        height: calc(100vh - 120px) !important;
-        margin-top: 120px !important;
+        height: calc(100vh - 120px);
+        margin-top: 120px;
     }
 
     .marker-customization {
@@ -1102,6 +1119,13 @@ select.popup-input {
         max-width: none;
         left: 5%;
         right: 5%;
+        transform: translateY(-50%);
+    }
+
+    .map-select {
+        width: 100%;
+        max-width: 200px;
+        margin: 5px 0;
     }
 }
 
@@ -1145,4 +1169,125 @@ select.popup-input {
     100% {
         box-shadow: 0 0 0 0 rgba(33, 150, 243, 0);
     }
+}
+
+/* Menu Mobile */
+.mobile-menu-btn {
+    display: none;
+    background: none;
+    border: none;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    padding: 5px;
+    margin-right: 10px;
+}
+
+.mobile-menu {
+    position: fixed;
+    top: 0;
+    left: -300px;
+    width: 220px;
+    height: 100vh;
+    background-color: #2c3e50;
+    z-index: 2000;
+    transition: left 0.3s ease;
+    color: white;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.2);
+}
+
+.mobile-menu.active {
+    left: 0;
+}
+
+.mobile-menu-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.mobile-menu-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    padding: 5px;
+}
+
+.mobile-menu-content {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.mobile-menu-content .menu-group {
+    flex-direction: column;
+    width: 100%;
+}
+
+.mobile-menu-content .menu-button,
+.mobile-menu-content .map-select,
+.mobile-menu-content .coord-input {
+    width: 100%;
+    padding: 10px;
+    margin: 5px 0;
+}
+
+.mobile-menu-footer {
+    padding: 20px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    margin-top: auto;
+}
+
+.mobile-menu-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    z-index: 1999;
+}
+
+.mobile-menu-overlay.active {
+    display: block;
+}
+
+/* Media queries */
+@media screen and (max-width: 768px) {
+    .mobile-menu-btn {
+        display: block;
+    }
+
+    .desktop-only {
+        display: none;
+    }
+
+    .menubar {
+        height: 60px;
+        flex-direction: row;
+        padding: 0 15px;
+    }
+
+    #map {
+        height: calc(100vh - 60px);
+        margin-top: 60px;
+    }
+}
+
+.mobile-menu-content .menu-button {
+    justify-content: flex-start;
+    width: 100%;
+    padding: 12px;
+    gap: 10px;
+}
+
+.mobile-button-text {
+    font-size: 14px;
+    white-space: nowrap;
 }
