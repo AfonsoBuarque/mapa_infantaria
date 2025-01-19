@@ -30,6 +30,7 @@ function updateMarkersList() {
     // Cria grupos para organizar as marcações
     const groups = {
         'Marcadores': window.markersLayer,
+        'KML Importado': window.kmlLayer,
         'Desenhos': window.drawnItems
     };
 
@@ -49,14 +50,32 @@ function updateMarkersList() {
             if (marker instanceof L.Marker) {
                 hasItems = true;
                 totalMarkers++;
-                const properties = marker.feature?.properties || {};
+
+                // Garante que o marcador tenha as propriedades necessárias
+                if (!marker.feature) {
+                    marker.feature = {
+                        type: 'Feature',
+                        properties: {
+                            name: 'Sem nome',
+                            description: 'Sem descrição',
+                            symbol: '📍',
+                            color: '#ff0000'
+                        }
+                    };
+                }
+
+                const properties = marker.feature.properties;
                 const itemDiv = document.createElement('div');
                 itemDiv.className = 'marker-item';
                 
                 // Cria o ícone em miniatura
                 const miniIcon = document.createElement('div');
                 miniIcon.className = 'mini-marker-icon';
-                miniIcon.style.backgroundColor = properties.color || '#ff0000';
+                if (properties.source === 'kml') {
+                    miniIcon.style.backgroundColor = 'transparent';
+                } else {
+                    miniIcon.style.backgroundColor = properties.color || '#ff0000';
+                }
                 miniIcon.innerHTML = `<span class="mini-marker-symbol">${properties.symbol || '📍'}</span>`;
 
                 // Cria o nome e descrição
@@ -95,12 +114,7 @@ function updateMarkersList() {
                 });
 
                 actionsDiv.querySelector('.edit-marker-btn').addEventListener('click', () => {
-                    window.editMarker(marker._leaflet_id);
-                    // Mostra o painel de personalização
-                    const customization = document.querySelector('.marker-customization');
-                    if (customization) {
-                        customization.classList.add('active');
-                    }
+                    marker.openPopup();
                 });
 
                 actionsDiv.querySelector('.delete-marker-btn').addEventListener('click', () => {

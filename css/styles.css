@@ -1069,6 +1069,35 @@ select.popup-input {
     padding: 8px;
 }
 
+.color-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.marker-form input[type="color"] {
+    width: 60px;
+}
+
+.transparent-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.9em;
+    color: #555;
+    cursor: pointer;
+}
+
+.transparent-checkbox input[type="checkbox"] {
+    margin: 0;
+    cursor: pointer;
+}
+
+input[type="color"]:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
 /* Media Queries para dispositivos móveis */
 @media screen and (max-width: 768px) {
     .menubar {
@@ -1330,4 +1359,84 @@ select.popup-input {
         font-size: 10px;
         padding: 3px;
     }
+}
+
+/* Estilos para o popup de edição de marcadores */
+.marker-popup-container {
+    min-width: 250px;
+}
+
+.marker-popup {
+    padding: 10px;
+}
+
+.marker-popup input[type="text"],
+.marker-popup textarea {
+    width: 100%;
+    margin-bottom: 10px;
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.marker-popup textarea {
+    height: 60px;
+    resize: vertical;
+}
+
+.marker-controls {
+    margin: 10px 0;
+}
+
+.control-group {
+    margin-bottom: 8px;
+}
+
+.control-group label {
+    display: block;
+    margin-bottom: 3px;
+    font-weight: bold;
+    color: #555;
+}
+
+.control-group select,
+.control-group input[type="color"],
+.control-group input[type="range"] {
+    width: 100%;
+    padding: 4px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.popup-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.popup-buttons button {
+    flex: 1;
+    padding: 8px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.save-marker {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.save-marker:hover {
+    background-color: #45a049;
+}
+
+.delete-marker {
+    background-color: #f44336;
+    color: white;
+}
+
+.delete-marker:hover {
+    background-color: #da190b;
 }
