@@ -6,6 +6,7 @@ class MovementHistory {
         this.historyUnsubscribe = null;
         this.userPaths = new Map(); // Armazena as polylines dos usuários
         this.setupUI();
+        this.setupCleanup();
     }
 
     setupUI() {
@@ -267,6 +268,34 @@ class MovementHistory {
         // Remover todos os caminhos
         this.userPaths.forEach(path => path.remove());
         this.userPaths.clear();
+    }
+
+    setupCleanup() {
+        // Executar limpeza imediatamente e depois a cada hora
+        this.cleanOldRecords();
+        setInterval(() => this.cleanOldRecords(), 3600000); // 1 hora em milissegundos
+    }
+
+    async cleanOldRecords() {
+        try {
+            const oneDayAgo = new Date();
+            oneDayAgo.setHours(oneDayAgo.getHours() - 24);
+
+            const snapshot = await this.db.collection('movement_history')
+                .where('timestamp', '<', oneDayAgo)
+                .get();
+
+            // Deletar em lotes para melhor performance
+            const batch = this.db.batch();
+            snapshot.docs.forEach(doc => {
+                batch.delete(doc.ref);
+            });
+            await batch.commit();
+
+            console.log(`Limpeza: ${snapshot.size} registros de movimentação removidos`);
+        } catch (error) {
+            console.error('Erro ao limpar histórico de movimentação:', error);
+        }
     }
 }
 

@@ -9,7 +9,6 @@ class MenuManager {
         const menuButton = document.createElement('div');
         menuButton.id = 'menu-button';
         menuButton.innerHTML = '<i class="fas fa-bars"></i>';
-        document.body.appendChild(menuButton);
 
         // Criar o menu lateral
         const menuContainer = document.createElement('div');
@@ -17,21 +16,25 @@ class MenuManager {
         menuContainer.innerHTML = `
             <div class="menu-header">
                 <span>Menu</span>
-                <button type="button" id="close-menu" class="close-button">
-                    <i class="fas fa-times"></i>
+                <button type="button" id="close-menu" class="close-button" data-action="close">
+                    <i class="fas fa-times" data-action="close"></i>
                 </button>
             </div>
-            <div class="menu-items">
-                <button type="button" id="toggle-chat-menu" class="menu-item">
-                    <i class="fas fa-comments"></i>
-                    Chat
-                </button>
-                <button type="button" id="toggle-history-menu" class="menu-item">
-                    <i class="fas fa-history"></i>
-                    Histórico
-                </button>
+            <div class="menu-content">
+                <div class="menu-items">
+                    <button id="toggle-chat-menu" class="menu-item">
+                        <i class="fas fa-comments"></i>
+                        Chat
+                    </button>
+                    <button id="toggle-history-menu" class="menu-item">
+                        <i class="fas fa-history"></i>
+                        Histórico
+                    </button>
+                </div>
             </div>
         `;
+
+        document.body.appendChild(menuButton);
         document.body.appendChild(menuContainer);
 
         // Adicionar estilos
@@ -80,23 +83,27 @@ class MenuManager {
             }
 
             .close-button {
-                background: none;
-                border: none;
-                color: white;
-                cursor: pointer;
-                font-size: 1.2em;
-                padding: 8px;
-                width: 32px;
-                height: 32px;
+                width: 30px;
+                height: 30px;
                 display: flex;
                 align-items: center;
                 justify-content: center;
+                cursor: pointer;
+                background: rgba(255,255,255,0.1);
+                border: none;
                 border-radius: 4px;
-                transition: background-color 0.3s;
+                color: white;
+                padding: 0;
+                transition: background 0.3s ease;
             }
 
             .close-button:hover {
-                background-color: rgba(255,255,255,0.1);
+                background: rgba(255,255,255,0.2);
+            }
+
+            .menu-content {
+                height: calc(100vh - 60px);
+                overflow-y: auto;
             }
 
             .menu-items {
@@ -139,80 +146,97 @@ class MenuManager {
                     width: 100%;
                     right: -100%;
                 }
-
-                #chat-container, #history-container {
-                    width: 100%;
-                    right: 0;
-                    left: 0;
-                }
             }
         `;
         document.head.appendChild(style);
     }
 
     setupEventListeners() {
+        // Elementos do DOM
         const menuButton = document.getElementById('menu-button');
-        const closeButton = document.getElementById('close-menu');
         const sideMenu = document.getElementById('side-menu');
+        const closeButton = document.getElementById('close-menu');
         const toggleChatButton = document.getElementById('toggle-chat-menu');
         const toggleHistoryButton = document.getElementById('toggle-history-menu');
 
+        // Função para fechar o menu
+        const closeMenu = (e) => {
+            if (e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            if (sideMenu) {
+                sideMenu.classList.remove('open');
+            }
+        };
+
         // Abrir menu
-        menuButton.addEventListener('click', (e) => {
-            e.stopPropagation();
-            sideMenu.classList.add('open');
-        });
+        if (menuButton) {
+            menuButton.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (sideMenu) {
+                    sideMenu.classList.add('open');
+                }
+            });
+        }
 
         // Fechar menu com o X
         if (closeButton) {
-            closeButton.addEventListener('click', (e) => {
+            // Usar evento nativo do botão
+            closeButton.onclick = (e) => {
+                closeMenu(e);
+            };
+        }
+
+        // Delegação de eventos para o menu inteiro
+        if (sideMenu) {
+            sideMenu.addEventListener('click', (e) => {
+                // Se o elemento clicado (ou seus pais) tem o atributo data-action="close"
+                const closeEl = e.target.closest('[data-action="close"]');
+                if (closeEl) {
+                    closeMenu(e);
+                    return;
+                }
+
+                // Prevenir que cliques dentro do menu o fechem
                 e.stopPropagation();
-                e.preventDefault();
-                sideMenu.classList.remove('open');
-                // Fechar também o chat e histórico
-                const chatContainer = document.getElementById('chat-container');
-                const historyContainer = document.getElementById('history-container');
-                if (chatContainer) chatContainer.classList.remove('visible');
-                if (historyContainer) historyContainer.classList.remove('visible');
             });
         }
 
         // Fechar menu ao clicar fora
         document.addEventListener('click', (e) => {
-            if (!sideMenu.contains(e.target) && !menuButton.contains(e.target)) {
-                sideMenu.classList.remove('open');
-                // Fechar também o chat e histórico
-                const chatContainer = document.getElementById('chat-container');
-                const historyContainer = document.getElementById('history-container');
-                if (chatContainer) chatContainer.classList.remove('visible');
-                if (historyContainer) historyContainer.classList.remove('visible');
+            if (!sideMenu?.contains(e.target) && !menuButton?.contains(e.target)) {
+                closeMenu();
             }
         });
 
-        // Prevenir que cliques dentro do menu fechem ele
-        sideMenu.addEventListener('click', (e) => {
-            e.stopPropagation();
-        });
-
         // Toggle chat
-        toggleChatButton.addEventListener('click', () => {
-            const chatContainer = document.getElementById('chat-container');
-            const historyContainer = document.getElementById('history-container');
-            
-            chatContainer.classList.toggle('visible');
-            historyContainer.classList.remove('visible');
-            sideMenu.classList.remove('open');
-        });
+        if (toggleChatButton) {
+            toggleChatButton.addEventListener('click', () => {
+                const chatContainer = document.getElementById('chat-container');
+                const historyContainer = document.getElementById('history-container');
+                
+                if (chatContainer && historyContainer) {
+                    chatContainer.classList.toggle('visible');
+                    historyContainer.classList.remove('visible');
+                    closeMenu();
+                }
+            });
+        }
 
         // Toggle histórico
-        toggleHistoryButton.addEventListener('click', () => {
-            const chatContainer = document.getElementById('chat-container');
-            const historyContainer = document.getElementById('history-container');
-            
-            historyContainer.classList.toggle('visible');
-            chatContainer.classList.remove('visible');
-            sideMenu.classList.remove('open');
-        });
+        if (toggleHistoryButton) {
+            toggleHistoryButton.addEventListener('click', () => {
+                const chatContainer = document.getElementById('chat-container');
+                const historyContainer = document.getElementById('history-container');
+                
+                if (chatContainer && historyContainer) {
+                    historyContainer.classList.toggle('visible');
+                    chatContainer.classList.remove('visible');
+                    closeMenu();
+                }
+            });
+        }
     }
 }
 
