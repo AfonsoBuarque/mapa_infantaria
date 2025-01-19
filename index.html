@@ -4,229 +4,312 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Aplicativo exclusivo para o uso do time de airsoft Infantaria Team. Todos o direitos reservados.">
-    <title>Infantaria Team Airsoft - Mapa Intel</title>
+    <title>Login - Infantaria Team Airsoft</title>
     <link rel="icon" type="image/png" href="https://i.postimg.cc/G3yKy72D/feliznatal-logo.png">
-    <!-- Leaflet CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <!-- Custom CSS -->
     <link rel="stylesheet" href="css/styles.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+        }
+
+        .login-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .login-box {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .logo-container {
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            width: 100px;
+            height: 100px;
+            margin-bottom: 15px;
+        }
+
+        .team-name {
+            font-size: 24px;
+            color: #2c3e50;
+            font-weight: bold;
+        }
+
+        .login-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .input-group {
+            position: relative;
+        }
+
+        .input-group i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #7f8c8d;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 20px 12px 45px;
+            border: 2px solid #bdc3c7;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-input:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+
+        .login-btn {
+            background: #2c3e50;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .login-btn:hover {
+            background: #34495e;
+        }
+
+        .google-btn {
+            background: white;
+            color: #333;
+            border: 2px solid #ddd;
+            margin-top: 10px;
+        }
+
+        .google-btn:hover {
+            background: #f5f5f5;
+        }
+
+        .or-divider {
+            margin: 20px 0;
+            display: flex;
+            align-items: center;
+            text-align: center;
+            color: #7f8c8d;
+        }
+
+        .or-divider::before,
+        .or-divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .or-divider span {
+            padding: 0 10px;
+        }
+
+        .error-message {
+            color: #e74c3c;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .register-link {
+            margin-top: 20px;
+            color: #7f8c8d;
+        }
+
+        .register-link a {
+            color: #3498db;
+            text-decoration: none;
+        }
+
+        .register-link a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 480px) {
+            .login-box {
+                padding: 30px 20px;
+            }
+        }
+    </style>
 </head>
 <body>
     <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-    
-    <div class="container">
-        <div id="map"></div>
-        
-        <!-- Menubar -->
-        <div class="menubar">
-            <div class="menubar-left">
-                <button id="mobile-menu-btn" class="mobile-menu-btn">
-                    <i class="fas fa-bars"></i>
-                </button>
-                <div class="logo-container">
-                    <img src="https://i.postimg.cc/G3yKy72D/feliznatal-logo.png" alt="Logo" class="logo">
-                    <span class="team-name">Infantaria Team</span>
-                </div>
+
+    <div class="login-container">
+        <div class="login-box">
+            <div class="logo-container">
+                <img src="https://i.postimg.cc/G3yKy72D/feliznatal-logo.png" alt="Logo" class="logo">
+                <div class="team-name">Infantaria Team</div>
             </div>
             
-            <div class="menubar-center desktop-only">
-                <!-- Ferramentas -->
-                <div class="tools">
-                    <div class="menu-group">
-                        <select id="map-type" class="map-select" title="Tipo de Mapa">
-                            <option value="osm">OpenStreetMap</option>
-                            <option value="satellite">Satélite</option>
-                        </select>
-                        <button id="toggle-draw" class="menu-button" title="Adicionar Marcador">
-                            <i class="fas fa-map-marker-alt"></i>
-                        </button>
-                        <button id="list-markers" class="menu-button" title="Listar Marcações">
-                            <i class="fas fa-list"></i>
-                        </button>
-                        <button id="import-kml" class="menu-button" title="Importar KML">
-                            <i class="fas fa-file-import"></i>
-                        </button>
-                        <button id="export-kml" class="menu-button" title="Exportar KML">
-                            <i class="fas fa-file-export"></i>
-                        </button>
-                        <input type="file" id="kml-file-input" accept=".kml" style="display: none;">
-                        <button id="location-btn" class="menu-button" title="Minha Localização">
-                            <i class="fas fa-location-arrow"></i>
-                        </button>
-                    </div>
+            <form class="login-form" id="login-form">
+                <div class="input-group">
+                    <i class="fas fa-envelope"></i>
+                    <input type="email" class="form-input" id="email" placeholder="Email" required>
                 </div>
                 
-                <!-- Coordenadas -->
-                <div class="coordinates">
-                    <div class="menu-group">
-                        <input type="number" id="lat" placeholder="Latitude" step="any" class="coord-input">
-                        <input type="number" id="lng" placeholder="Longitude" step="any" class="coord-input">
-                        <button id="search-coord-btn" class="menu-button" title="Buscar Coordenadas">
-                            <i class="fas fa-search"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="menubar-right">
-                <button id="logout-btn">Sair</button>
-            </div>
-        </div>
-        
-        <!-- Menu Mobile -->
-        <div class="mobile-menu">
-            <div class="mobile-menu-header">
-                <div class="logo-container">
-                    <img src="https://i.postimg.cc/G3yKy72D/feliznatal-logo.png" alt="Logo" class="logo">
-                    <span class="team-name">Infantaria Team</span>
-                </div>
-                <button class="mobile-menu-close">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            
-            <div class="mobile-menu-content">
-                <!-- Ferramentas -->
-                <div class="tools">
-                    <div class="menu-group">
-                        <select id="map-type-mobile" class="map-select" title="Tipo de Mapa">
-                            <option value="osm">OpenStreetMap</option>
-                            <option value="satellite">Satélite</option>
-                        </select>
-                        <button id="toggle-draw-mobile" class="menu-button" title="Adicionar Marcador">
-                            <i class="fas fa-map-marker-alt"></i>
-                            <span class="mobile-button-text">Adicionar Marcador</span>
-                        </button>
-                        <button id="list-markers-mobile" class="menu-button" title="Listar Marcações">
-                            <i class="fas fa-list"></i>
-                            <span class="mobile-button-text">Listar Marcações</span>
-                        </button>
-                        <button id="import-kml-mobile" class="menu-button" title="Importar KML">
-                            <i class="fas fa-file-import"></i>
-                            <span class="mobile-button-text">Importar KML</span>
-                        </button>
-                        <button id="export-kml-mobile" class="menu-button" title="Exportar KML">
-                            <i class="fas fa-file-export"></i>
-                            <span class="mobile-button-text">Exportar KML</span>
-                        </button>
-                        <button id="location-btn-mobile" class="menu-button" title="Minha Localização">
-                            <i class="fas fa-location-arrow"></i>
-                            <span class="mobile-button-text">Minha Localização</span>
-                        </button>
-                    </div>
+                <div class="input-group">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" class="form-input" id="password" placeholder="Senha" required>
                 </div>
                 
-                <!-- Coordenadas -->
-                <div class="coordinates">
-                    <div class="menu-group">
-                        <input type="number" id="lat-mobile" placeholder="Latitude" step="any" class="coord-input">
-                        <input type="number" id="lng-mobile" placeholder="Longitude" step="any" class="coord-input">
-                        <button id="search-coord-btn-mobile" class="menu-button" title="Buscar Coordenadas">
-                            <i class="fas fa-search"></i>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Logout -->
-                <div class="mobile-menu-footer">
-                    <button id="logout-btn-mobile" class="logout-btn">Sair</button>
-                    <div class="developer-credits">
-                        <a href="https://faithflowtech.com.br/" target="_blank" rel="noopener noreferrer">@ByAfonsoBuarque</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="sidebar-overlay" id="sidebar-overlay"></div>
-        
-        <div class="sidebar" id="sidebar">
-            <div class="sidebar-header">
-                <button class="close-menu" id="close-menu">
-                    <i class="fas fa-times"></i>
+                <button type="submit" class="login-btn">
+                    <i class="fas fa-sign-in-alt"></i>
+                    <span>Entrar com Email</span>
                 </button>
-            </div>
-            <div class="sidebar-content">
-                <!-- Controles de Camadas -->
 
-                <!-- Personalização de Marcadores -->
-                <div class="marker-customization">
-                    <div class="marker-customization-header">
-                        <h3>Personalizar Marcador</h3>
-                        <button class="close-customization-btn" title="Fechar">×</button>
-                    </div>
-                    <div class="marker-form">
-                        <div class="form-group">
-                            <label for="marker-title">Título:</label>
-                            <input type="text" id="marker-title" placeholder="Nome do marcador">
-                        </div>
-                        <div class="form-group">
-                            <label for="marker-description">Descrição:</label>
-                            <textarea id="marker-description" placeholder="Descrição do marcador"></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label for="marker-color">Cor:</label>
-                            <input type="color" id="marker-color" value="#ff0000">
-                        </div>
-                        <div class="form-group">
-                            <label for="marker-icon">Ícone:</label>
-                            <select id="marker-icon">
-                                <option value="📍">📍 Marcador</option>
-                                <option value="🎯">🎯 Alvo</option>
-                                <option value="⭐">⭐ Estrela</option>
-                                <option value="🚩">🚩 Bandeira</option>
-                                <option value="🏁">🏁 Chegada</option>
-                                <option value="💎">💎 Diamante</option>
-                                <option value="🔥">🔥 Fogo</option>
-                                <option value="⚡">⚡ Raio</option>
-                                <option value="❗">❗ Atenção</option>
-                                <option value="🔍">🔍 Busca</option>
-                            </select>
-                        </div>
-                    </div>
+                <div class="or-divider">
+                    <span>ou</span>
                 </div>
+
+                <button type="button" class="login-btn google-btn" id="google-login">
+                    <img src="https://www.google.com/favicon.ico" alt="Google" style="width: 18px; height: 18px;">
+                    <span>Entrar com Google</span>
+                </button>
+                
+                <div class="error-message" id="error-message"></div>
+            </form>
+            
+            <div class="register-link">
+                Não tem uma conta? <a href="#" id="register-link">Registre-se</a>
             </div>
         </div>
     </div>
 
-    <footer class="copyright">
-        &copy; 2024 Infantaria Team. Todos os direitos reservados.
-    </footer>
-
-    <!-- Leaflet JS -->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
-    
-    <!-- Custom JS -->
-    <script src="js/map.js"></script>
-    <script src="js/markers.js"></script>
-    <script src="js/markers-list.js"></script>
-    <script src="js/kml-import.js"></script>
-    <script src="js/kml-export.js"></script>
-    <script src="js/auth.js"></script>
-    <script src="js/draw.js"></script>
-    <script src="js/tools.js"></script>
-    <script src="js/menu.js"></script>
-    <script src="js/layers.js"></script>
-
     <script>
-        // Verifica autenticação
-        firebase.auth().onAuthStateChanged(function(user) {
-            if (!user) {
-                // Usuário não está logado, redireciona para a página de login
-                window.location.href = 'login.html';
+        // Configuração do Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyACZPubimPLAFWm5vebMJdgRtxmnY5ThOk",
+            authDomain: "fft-solucoes.firebaseapp.com",
+            projectId: "fft-solucoes",
+            storageBucket: "fft-solucoes.firebasestorage.app",
+            messagingSenderId: "478444990886",
+            appId: "1:478444990886:web:02365a5028c823d3dcdf67",
+            measurementId: "G-YT6J674H4V"
+        };
+        
+        // Inicializar Firebase
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+
+        // Verificar se já está logado
+        firebase.auth().onAuthStateChanged((user) => {
+            if (user) {
+                window.location.href = 'map.html';
             }
         });
 
-        // Logout
-        document.getElementById('logout-btn').addEventListener('click', function() {
-            firebase.auth().signOut().then(() => {
-                window.location.href = 'login.html';
-            });
+        // Login com Google
+        document.getElementById('google-login').addEventListener('click', async () => {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            const errorMessage = document.getElementById('error-message');
+            const googleBtn = document.getElementById('google-login');
+            
+            try {
+                googleBtn.disabled = true;
+                googleBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Conectando...';
+                
+                await firebase.auth().signInWithPopup(provider);
+                window.location.href = 'map.html';
+            } catch (error) {
+                errorMessage.style.display = 'block';
+                switch (error.code) {
+                    case 'auth/popup-blocked':
+                        errorMessage.textContent = 'Por favor, permita popups para fazer login com o Google.';
+                        break;
+                    case 'auth/popup-closed-by-user':
+                        errorMessage.textContent = 'Login cancelado. Tente novamente.';
+                        break;
+                    case 'auth/cancelled-popup-request':
+                        // Ignora este erro pois é comum quando múltiplos popups são abertos
+                        break;
+                    default:
+                        errorMessage.textContent = 'Erro ao fazer login com Google. Tente novamente.';
+                        console.error('Erro de login com Google:', error);
+                }
+            } finally {
+                googleBtn.disabled = false;
+                googleBtn.innerHTML = '<img src="https://www.google.com/favicon.ico" alt="Google" style="width: 18px; height: 18px;"><span>Entrar com Google</span>';
+            }
+        });
+
+        // Manipular login com email/senha
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const errorMessage = document.getElementById('error-message');
+            const loginBtn = document.querySelector('.login-btn');
+            
+            try {
+                loginBtn.disabled = true;
+                loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Entrando...';
+                
+                await firebase.auth().signInWithEmailAndPassword(email, password);
+                window.location.href = 'map.html';
+            } catch (error) {
+                errorMessage.style.display = 'block';
+                switch (error.code) {
+                    case 'auth/invalid-email':
+                        errorMessage.textContent = 'Email inválido.';
+                        break;
+                    case 'auth/user-disabled':
+                        errorMessage.textContent = 'Usuário desativado.';
+                        break;
+                    case 'auth/user-not-found':
+                        errorMessage.textContent = 'Usuário não encontrado.';
+                        break;
+                    case 'auth/wrong-password':
+                        errorMessage.textContent = 'Senha incorreta.';
+                        break;
+                    default:
+                        errorMessage.textContent = 'Erro ao fazer login. Tente novamente.';
+                }
+            } finally {
+                loginBtn.disabled = false;
+                loginBtn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Entrar com Email';
+            }
+        });
+
+        // Manipular registro
+        document.getElementById('register-link').addEventListener('click', (e) => {
+            e.preventDefault();
+            alert('Funcionalidade de registro em desenvolvimento. Por favor, entre em contato com o administrador.');
         });
     </script>
 </body>

@@ -1440,3 +1440,51 @@ input[type="color"]:disabled {
 .delete-marker:hover {
     background-color: #da190b;
 }
+
+.compass-container {
+    position: fixed;
+    bottom: 80px;
+    right: 10px;
+    z-index: 9999;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 50%;
+    padding: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    display: none;
+    touch-action: none;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+.compass {
+    width: 50px;
+    height: 50px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.compass-arrow {
+    position: absolute;
+    width: 4px;
+    height: 25px;
+    background: linear-gradient(to bottom, #e74c3c 50%, #2c3e50 50%);
+    transform-origin: center bottom;
+}
+
+.compass-text {
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    font-size: 14px;
+    font-weight: bold;
+    color: #2c3e50;
+    top: -20px;
+}
+
+@media (max-width: 768px) {
+    .compass-container {
+        display: block;
+    }
+}

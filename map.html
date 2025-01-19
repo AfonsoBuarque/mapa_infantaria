@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Aplicativo exclusivo para o uso do time de airsoft Infantaria Team. Todos o direitos reservados.">
+    <title>Infantaria Team Airsoft - Mapa Intel</title>
+    <link rel="icon" type="image/png" href="https://i.postimg.cc/G3yKy72D/feliznatal-logo.png">
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    
+    <script>
+        // Configuração do Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyACZPubimPLAFWm5vebMJdgRtxmnY5ThOk",
+            authDomain: "fft-solucoes.firebaseapp.com",
+            projectId: "fft-solucoes",
+            storageBucket: "fft-solucoes.firebasestorage.app",
+            messagingSenderId: "478444990886",
+            appId: "1:478444990886:web:02365a5028c823d3dcdf67",
+            measurementId: "G-YT6J674H4V"
+        };
+        
+        // Inicializar Firebase
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+
+        // Verificar autenticação
+        firebase.auth().onAuthStateChanged((user) => {
+            if (!user) {
+                window.location.href = 'index.html';
+            }
+        });
+    </script>
+
+    <div class="container">
+        <div id="map"></div>
+        
+        <!-- Menubar -->
+        <div class="menubar">
+            <div class="menubar-left">
+                <button id="mobile-menu-btn" class="mobile-menu-btn">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="logo-container">
+                    <img src="https://i.postimg.cc/G3yKy72D/feliznatal-logo.png" alt="Logo" class="logo">
+                    <span class="team-name">Infantaria Team</span>
+                </div>
+            </div>
+            
+            <div class="menubar-center desktop-only">
+                <!-- Ferramentas -->
+                <div class="tools">
+                    <div class="menu-group">
+                        <select id="map-type" class="map-select" title="Tipo de Mapa">
+                            <option value="osm">OpenStreetMap</option>
+                            <option value="satellite">Satélite</option>
+                        </select>
+                        <button id="toggle-draw" class="menu-button" title="Adicionar Marcador">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </button>
+                        <button id="list-markers" class="menu-button" title="Listar Marcações">
+                            <i class="fas fa-list"></i>
+                        </button>
+                        <button id="import-kml" class="menu-button" title="Importar KML">
+                            <i class="fas fa-file-import"></i>
+                        </button>
+                        <button id="export-kml" class="menu-button" title="Exportar KML">
+                            <i class="fas fa-file-export"></i>
+                        </button>
+                        <input type="file" id="kml-file-input" accept=".kml" style="display: none;">
+                        <button id="location-btn" class="menu-button" title="Minha Localização">
+                            <i class="fas fa-location-arrow"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Coordenadas -->
+                <div class="coordinates">
+                    <div class="menu-group">
+                        <input type="number" id="lat" placeholder="Latitude" step="any" class="coord-input">
+                        <input type="number" id="lng" placeholder="Longitude" step="any" class="coord-input">
+                        <button id="search-coord-btn" class="menu-button" title="Buscar Coordenadas">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="menubar-right">
+                <button id="logout-btn" class="menu-button" title="Sair">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Sair</span>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Menu Mobile -->
+        <div class="mobile-menu">
+            <div class="mobile-menu-header">
+                <div class="logo-container">
+                    <img src="https://i.postimg.cc/G3yKy72D/feliznatal-logo.png" alt="Logo" class="logo">
+                    <span class="team-name">Infantaria Team</span>
+                </div>
+                <button class="mobile-menu-close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="mobile-menu-content">
+                <!-- Ferramentas -->
+                <div class="tools">
+                    <div class="menu-group">
+                        <select id="map-type-mobile" class="map-select" title="Tipo de Mapa">
+                            <option value="osm">OpenStreetMap</option>
+                            <option value="satellite">Satélite</option>
+                        </select>
+                        <button id="toggle-draw-mobile" class="menu-button" title="Adicionar Marcador">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span class="mobile-button-text">Adicionar Marcador</span>
+                        </button>
+                        <button id="list-markers-mobile" class="menu-button" title="Listar Marcações">
+                            <i class="fas fa-list"></i>
+                            <span class="mobile-button-text">Listar Marcações</span>
+                        </button>
+                        <button id="import-kml-mobile" class="menu-button" title="Importar KML">
+                            <i class="fas fa-file-import"></i>
+                            <span class="mobile-button-text">Importar KML</span>
+                        </button>
+                        <button id="export-kml-mobile" class="menu-button" title="Exportar KML">
+                            <i class="fas fa-file-export"></i>
+                            <span class="mobile-button-text">Exportar KML</span>
+                        </button>
+                        <button id="location-btn-mobile" class="menu-button" title="Minha Localização">
+                            <i class="fas fa-location-arrow"></i>
+                            <span class="mobile-button-text">Minha Localização</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Coordenadas -->
+                <div class="coordinates">
+                    <div class="menu-group">
+                        <input type="number" id="lat-mobile" placeholder="Latitude" step="any" class="coord-input">
+                        <input type="number" id="lng-mobile" placeholder="Longitude" step="any" class="coord-input">
+                        <button id="search-coord-btn-mobile" class="menu-button" title="Buscar Coordenadas">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Logout -->
+                <div class="mobile-menu-footer">
+                    <button id="logout-btn-mobile" class="logout-btn">Sair</button>
+                    <div class="developer-credits">
+                        <a href="https://faithflowtech.com.br/" target="_blank" rel="noopener noreferrer">@ByAfonsoBuarque</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="sidebar-overlay" id="sidebar-overlay"></div>
+        
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <button class="close-menu" id="close-menu">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="sidebar-content">
+                <!-- Controles de Camadas -->
+
+                <!-- Personalização de Marcadores -->
+                <div class="marker-customization">
+                    <div class="marker-customization-header">
+                        <h3>Personalizar Marcador</h3>
+                        <button class="close-customization-btn" title="Fechar">×</button>
+                    </div>
+                    <div class="marker-form">
+                        <div class="form-group">
+                            <label for="marker-title">Título:</label>
+                            <input type="text" id="marker-title" placeholder="Nome do marcador">
+                        </div>
+                        <div class="form-group">
+                            <label for="marker-description">Descrição:</label>
+                            <textarea id="marker-description" placeholder="Descrição do marcador"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="marker-color">Cor:</label>
+                            <input type="color" id="marker-color" value="#ff0000">
+                        </div>
+                        <div class="form-group">
+                            <label for="marker-icon">Ícone:</label>
+                            <select id="marker-icon">
+                                <option value="📍">📍 Marcador</option>
+                                <option value="🎯">🎯 Alvo</option>
+                                <option value="⭐">⭐ Estrela</option>
+                                <option value="🚩">🚩 Bandeira</option>
+                                <option value="🏁">🏁 Chegada</option>
+                                <option value="💎">💎 Diamante</option>
+                                <option value="🔥">🔥 Fogo</option>
+                                <option value="⚡">⚡ Raio</option>
+                                <option value="❗">❗ Atenção</option>
+                                <option value="🔍">🔍 Busca</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="copyright">
+        &copy; 2024 Infantaria Team. Todos os direitos reservados.
+    </footer>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
+    
+    <!-- Custom JS -->
+    <script src="js/map.js"></script>
+    <script src="js/kml-import.js"></script>
+    <script src="js/compass.js"></script>
+    <script src="js/markers.js"></script>
+    <script src="js/markers-list.js"></script>
+    <script src="js/kml-export.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/draw.js"></script>
+    <script src="js/tools.js"></script>
+    <script src="js/menu.js"></script>
+    <script src="js/layers.js"></script>
+
+    <script>
+        // Logout
+        document.getElementById('logout-btn').addEventListener('click', function() {
+            firebase.auth().signOut().then(() => {
+                window.location.href = 'index.html';
+            }).catch((error) => {
+                console.error('Erro ao fazer logout:', error);
+            });
+        });
+    </script>
+</body>
+</html>
