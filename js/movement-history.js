@@ -220,16 +220,18 @@ class MovementHistory {
                 this.userPaths.get(userId).remove();
             }
 
-            // Criar novo caminho
-            if (coordinates.length > 1) {
-                const color = this.getRandomColor();
-                const path = L.polyline(coordinates, {
-                    color: color,
-                    className: 'user-path'
-                }).addTo(this.map);
+            if (coordinates.length < 2) return;
 
-                this.userPaths.set(userId, path);
-            }
+            // Criar novo caminho
+            const pathCoords = coordinates;
+            const polyline = L.polyline(pathCoords, {
+                color: this.getRandomColor(),
+                weight: 3,
+                opacity: 0.6
+            }).addTo(this.map);
+
+            // Armazenar referência ao caminho
+            this.userPaths.set(userId, polyline);
         } catch (error) {
             console.error('Erro ao atualizar caminho:', error);
         }

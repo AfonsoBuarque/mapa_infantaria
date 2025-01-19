@@ -139,6 +139,8 @@ class OnlineUsersManager {
             marker.addTo(this.map);
             this.userMarkers.set(userId, marker);
         }
+        // Removendo a centralização automática das marcações
+        // this.map.panTo(position);
     }
 
     removeUserMarker(userId) {
