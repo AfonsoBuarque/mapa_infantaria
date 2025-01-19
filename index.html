@@ -338,5 +338,22 @@
             alert('Funcionalidade de registro em desenvolvimento. Por favor, entre em contato com o administrador.');
         });
     </script>
+    <script src="js/menu-manager.js"></script>
+    <script src="js/markers-manager.js"></script>
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            // Inicializar o mapa
+            const map = L.map('map').setView([-15.7801, -47.9292], 13);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
+            // Inicializar gerenciadores
+            window.menuManager = new MenuManager();
+            window.markersManager = new MarkersManager(map);
+            window.onlineUsers = new OnlineUsers(map);
+            window.chat = new Chat();
+            window.movementHistory = new MovementHistory(map);
+            window.compass = new Compass();
+        });
+    </script>
 </body>
 </html>
