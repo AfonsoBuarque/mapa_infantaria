@@ -14,8 +14,8 @@ class ChatManager {
         chatContainer.innerHTML = `
             <div class="chat-header">
                 <span>Chat</span>
-                <button id="toggle-chat" class="toggle-chat">
-                    <i class="fas fa-chevron-down"></i>
+                <button type="button" class="close-chat">
+                    <i class="fas fa-times"></i>
                 </button>
             </div>
             <div class="chat-messages" id="chat-messages"></div>
@@ -43,6 +43,11 @@ class ChatManager {
                 display: flex;
                 flex-direction: column;
                 max-height: 400px;
+                display: none;
+            }
+
+            #chat-container.visible {
+                display: flex;
             }
 
             .chat-header {
@@ -53,7 +58,20 @@ class ChatManager {
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
+            }
+
+            .chat-header button {
+                background: none;
+                border: none;
+                color: white;
                 cursor: pointer;
+                padding: 5px;
+                border-radius: 4px;
+                transition: background-color 0.3s;
+            }
+
+            .chat-header button:hover {
+                background-color: rgba(255,255,255,0.1);
             }
 
             .chat-messages {
@@ -122,9 +140,11 @@ class ChatManager {
             @media (max-width: 480px) {
                 #chat-container {
                     width: 100%;
+                    height: 100%;
                     bottom: 0;
                     right: 0;
-                    border-radius: 10px 10px 0 0;
+                    border-radius: 0;
+                    max-height: none;
                 }
             }
         `;
@@ -134,9 +154,15 @@ class ChatManager {
     setupEventListeners() {
         const messageInput = document.getElementById('message-input');
         const sendButton = document.getElementById('send-message');
-        const toggleButton = document.getElementById('toggle-chat');
-        const chatMessages = document.getElementById('chat-messages');
         const chatContainer = document.getElementById('chat-container');
+        const closeButton = chatContainer.querySelector('.close-chat');
+
+        // Fechar chat
+        closeButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            chatContainer.classList.remove('visible');
+        });
 
         // Enviar mensagem
         const sendMessage = async () => {
@@ -155,6 +181,7 @@ class ChatManager {
                 });
 
                 messageInput.value = '';
+                const chatMessages = document.getElementById('chat-messages');
                 chatMessages.scrollTop = chatMessages.scrollHeight;
             } catch (error) {
                 console.error('Erro ao enviar mensagem:', error);
@@ -166,18 +193,12 @@ class ChatManager {
             if (e.key === 'Enter') sendMessage();
         });
 
-        // Toggle chat
-        toggleButton.addEventListener('click', () => {
-            chatMessages.style.display = chatMessages.style.display === 'none' ? 'block' : 'none';
-            toggleButton.querySelector('i').classList.toggle('fa-chevron-up');
-            toggleButton.querySelector('i').classList.toggle('fa-chevron-down');
-        });
-
         // Iniciar monitoramento de mensagens
         this.startMessageMonitoring();
     }
 
     startMessageMonitoring() {
+        const chatContainer = document.getElementById('chat-container');
         const chatMessages = document.getElementById('chat-messages');
         
         this.messagesUnsubscribe = this.db.collection('chat')
@@ -204,6 +225,7 @@ class ChatManager {
                         
                         chatMessages.appendChild(messageDiv);
                         chatMessages.scrollTop = chatMessages.scrollHeight;
+                        chatContainer.classList.add('visible');
                     }
                 });
             });

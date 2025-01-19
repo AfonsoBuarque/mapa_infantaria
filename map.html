@@ -246,6 +246,7 @@
     <script src="js/tools.js"></script>
     <script src="js/menu.js"></script>
     <script src="js/layers.js"></script>
+    <script src="js/menu-manager.js"></script>
 
     <script>
         // Logout
@@ -264,6 +265,7 @@
             const onlineUsers = new OnlineUsersManager(e.detail.map);
             const chat = new ChatManager();
             const history = new MovementHistory(e.detail.map);
+            const menu = new MenuManager();
             
             onlineUsers.init();
 

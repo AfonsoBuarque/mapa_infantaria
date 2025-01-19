@@ -1,119 +1,225 @@
-class CompassController {
-    constructor() {
-        this.createCompassElement();
-        this.compassContainer = document.getElementById('compass-container');
-        this.compassArrow = this.compassContainer.querySelector('.compass-arrow');
-        this.compassText = this.compassContainer.querySelector('.compass-text');
+class CompassControl {
+    constructor(map) {
+        this.map = map;
+        this.setupCompass();
+        this.setupEventListeners();
         this.lastOrientation = 0;
-        this.init();
+        this.isCalibrating = false;
     }
 
-    createCompassElement() {
-        const compassHtml = `
-            <div class="compass-container" id="compass-container">
-                <div class="compass">
-                    <div class="compass-arrow"></div>
-                    <div class="compass-text">N</div>
-                </div>
+    setupCompass() {
+        // Criar o container da bússola
+        const compassContainer = document.createElement('div');
+        compassContainer.className = 'compass-container';
+        compassContainer.innerHTML = `
+            <div class="compass">
+                <div class="compass-arrow"></div>
+                <div class="compass-circle"></div>
+                <div class="compass-degrees">0°</div>
+            </div>
+            <div class="calibration-message" style="display: none;">
+                <p>Calibrando bússola...</p>
+                <p>Por favor, faça um movimento em forma de 8 com seu dispositivo.</p>
             </div>
         `;
-        document.body.insertAdjacentHTML('beforeend', compassHtml);
-    }
+        document.body.appendChild(compassContainer);
 
-    init() {
-        // Verificar se é um dispositivo móvel
-        if (this.isMobileDevice()) {
-            this.setupDeviceOrientation();
-        } else {
-            console.log('Não é um dispositivo móvel - bússola desativada');
-            this.compassContainer.style.display = 'none';
-        }
-    }
+        // Adicionar estilos
+        const style = document.createElement('style');
+        style.textContent = `
+            .compass-container {
+                position: fixed;
+                bottom: 20px;
+                left: 20px;
+                z-index: 1000;
+            }
 
-    isMobileDevice() {
-        return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    }
+            .compass {
+                width: 60px;
+                height: 60px;
+                position: relative;
+                background: rgba(255, 255, 255, 0.9);
+                border-radius: 50%;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: transform 0.3s ease;
+            }
 
-    setupDeviceOrientation() {
-        if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
-            // iOS 13+ requer permissão
-            this.compassContainer.addEventListener('click', async () => {
-                try {
-                    const permission = await DeviceOrientationEvent.requestPermission();
-                    if (permission === 'granted') {
-                        this.startListening();
-                        this.compassContainer.style.display = 'block';
-                    } else {
-                        console.log('Permissão negada para acessar a orientação do dispositivo');
-                        this.compassContainer.style.display = 'none';
-                    }
-                } catch (error) {
-                    console.error('Erro ao solicitar permissão:', error);
-                    this.compassContainer.style.display = 'none';
+            .compass-arrow {
+                position: absolute;
+                width: 4px;
+                height: 30px;
+                background: linear-gradient(to bottom, #e74c3c 50%, #2c3e50 50%);
+                transform-origin: center;
+            }
+
+            .compass-circle {
+                position: absolute;
+                width: 8px;
+                height: 8px;
+                background: #2c3e50;
+                border-radius: 50%;
+            }
+
+            .compass-degrees {
+                position: absolute;
+                bottom: -25px;
+                width: 100%;
+                text-align: center;
+                font-size: 12px;
+                color: #2c3e50;
+                background: rgba(255, 255, 255, 0.8);
+                padding: 2px 4px;
+                border-radius: 4px;
+            }
+
+            .calibration-message {
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: rgba(0, 0, 0, 0.8);
+                color: white;
+                padding: 20px;
+                border-radius: 10px;
+                text-align: center;
+                z-index: 1001;
+            }
+
+            .calibration-message p {
+                margin: 10px 0;
+            }
+
+            @media (max-width: 480px) {
+                .compass {
+                    width: 50px;
+                    height: 50px;
                 }
-            });
-            
-            // Mostrar a bússola para que o usuário possa clicar e conceder permissão
-            this.compassContainer.style.display = 'block';
+
+                .compass-arrow {
+                    height: 25px;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    }
+
+    setupEventListeners() {
+        if (window.DeviceOrientationEvent) {
+            // Verificar se precisa de permissão (iOS 13+)
+            if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+                // Criar botão para solicitar permissão
+                const permissionButton = document.createElement('button');
+                permissionButton.innerHTML = 'Ativar Bússola';
+                permissionButton.className = 'compass-permission-button';
+                permissionButton.style.cssText = `
+                    position: fixed;
+                    bottom: 90px;
+                    left: 20px;
+                    padding: 8px 16px;
+                    background: #3498db;
+                    color: white;
+                    border: none;
+                    border-radius: 4px;
+                    cursor: pointer;
+                    z-index: 1000;
+                `;
+
+                permissionButton.onclick = async () => {
+                    try {
+                        const permission = await DeviceOrientationEvent.requestPermission();
+                        if (permission === 'granted') {
+                            this.startCompass();
+                            permissionButton.remove();
+                        }
+                    } catch (error) {
+                        console.error('Erro ao solicitar permissão:', error);
+                    }
+                };
+
+                document.body.appendChild(permissionButton);
+            } else {
+                // Não precisa de permissão, iniciar direto
+                this.startCompass();
+            }
         } else {
-            // Android e outros dispositivos
-            this.startListening();
-            this.compassContainer.style.display = 'block';
+            console.warn('Dispositivo não suporta orientação');
         }
     }
 
-    startListening() {
-        if (window.DeviceOrientationAbsoluteEvent) {
-            window.addEventListener('deviceorientationabsolute', this.handleOrientation.bind(this), true);
-        } else {
-            window.addEventListener('deviceorientation', this.handleOrientation.bind(this), true);
+    startCompass() {
+        window.addEventListener('deviceorientation', (e) => {
+            // Verificar se os dados são válidos
+            if (e.alpha === null) {
+                if (!this.isCalibrating) {
+                    this.showCalibrationMessage();
+                }
+                return;
+            }
+
+            // Esconder mensagem de calibração se estiver visível
+            if (this.isCalibrating) {
+                this.hideCalibrationMessage();
+            }
+
+            // Obter o ângulo e aplicar suavização
+            let angle = e.alpha;
+            if (e.webkitCompassHeading) {
+                // Para iOS
+                angle = e.webkitCompassHeading;
+            }
+
+            // Suavizar a rotação
+            const smoothFactor = 0.3;
+            const smoothedAngle = this.smoothAngle(angle, smoothFactor);
+
+            // Atualizar a bússola
+            this.updateCompass(smoothedAngle);
+        });
+    }
+
+    smoothAngle(newAngle, factor) {
+        if (Math.abs(newAngle - this.lastOrientation) > 180) {
+            if (newAngle > this.lastOrientation) {
+                this.lastOrientation += 360;
+            } else {
+                this.lastOrientation -= 360;
+            }
+        }
+
+        const smoothed = this.lastOrientation + factor * (newAngle - this.lastOrientation);
+        this.lastOrientation = smoothed % 360;
+        return this.lastOrientation;
+    }
+
+    updateCompass(degrees) {
+        const compass = document.querySelector('.compass');
+        const degreesDisplay = document.querySelector('.compass-degrees');
+        
+        if (compass && degreesDisplay) {
+            compass.style.transform = `rotate(${degrees}deg)`;
+            degreesDisplay.textContent = `${Math.round(degrees)}°`;
         }
     }
 
-    handleOrientation(event) {
-        let heading;
-        
-        if (event.webkitCompassHeading) {
-            // iOS
-            heading = event.webkitCompassHeading;
-        } else if (event.absolute === true && event.alpha !== null) {
-            // Android
-            heading = 360 - event.alpha;
-        } else {
-            // Dispositivo não suporta orientação absoluta
-            console.log('Dispositivo não suporta orientação absoluta');
-            return;
+    showCalibrationMessage() {
+        this.isCalibrating = true;
+        const message = document.querySelector('.calibration-message');
+        if (message) {
+            message.style.display = 'block';
         }
-
-        // Suavizar a rotação
-        this.lastOrientation = this.smoothRotation(heading, this.lastOrientation);
-        
-        // Atualizar a seta da bússola
-        this.compassArrow.style.transform = `rotate(${this.lastOrientation}deg)`;
-        
-        // Atualizar o texto
-        const cardinalDirection = this.getCardinalDirection(this.lastOrientation);
-        this.compassText.textContent = cardinalDirection;
     }
 
-    smoothRotation(newRotation, oldRotation) {
-        const smoothFactor = 0.3;
-        return oldRotation + (smoothFactor * this.getShortestAngle(newRotation, oldRotation));
-    }
-
-    getShortestAngle(angle1, angle2) {
-        const diff = ((angle1 - angle2 + 180) % 360) - 180;
-        return diff < -180 ? diff + 360 : diff;
-    }
-
-    getCardinalDirection(degrees) {
-        const directions = ['N', 'NE', 'L', 'SE', 'S', 'SO', 'O', 'NO'];
-        const index = Math.round(degrees / 45) % 8;
-        return directions[index];
+    hideCalibrationMessage() {
+        this.isCalibrating = false;
+        const message = document.querySelector('.calibration-message');
+        if (message) {
+            message.style.display = 'none';
+        }
     }
 }
 
-// Inicializar a bússola quando o DOM estiver carregado
-document.addEventListener('DOMContentLoaded', () => {
-    new CompassController();
-});
+// Exportar para uso global
+window.CompassControl = CompassControl;

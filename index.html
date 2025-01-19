@@ -267,6 +267,7 @@
                 await firebase.auth().signInWithPopup(provider);
                 window.location.href = 'map.html';
             } catch (error) {
+                console.error('Erro detalhado:', error);
                 errorMessage.style.display = 'block';
                 switch (error.code) {
                     case 'auth/popup-blocked':
@@ -278,9 +279,13 @@
                     case 'auth/cancelled-popup-request':
                         // Ignora este erro pois é comum quando múltiplos popups são abertos
                         break;
+                    case 'auth/unauthorized-domain':
+                        errorMessage.textContent = 'Este domínio não está autorizado para login. Aguarde alguns minutos após a configuração do Firebase.';
+                        console.error('Domínio não autorizado. Adicione localizacao.infantariaairsoftteam.com.br no console do Firebase em Authentication > Settings > Authorized domains');
+                        break;
                     default:
-                        errorMessage.textContent = 'Erro ao fazer login com Google. Tente novamente.';
-                        console.error('Erro de login com Google:', error);
+                        errorMessage.textContent = `Erro ao fazer login com Google: ${error.message}`;
+                        console.error('Código do erro:', error.code);
                 }
             } finally {
                 googleBtn.disabled = false;

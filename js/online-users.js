@@ -52,17 +52,7 @@ class OnlineUsersManager {
             }, 30000); // A cada 30 segundos
 
             // Iniciar monitoramento de localização
-            if ("geolocation" in navigator) {
-                this.watchId = navigator.geolocation.watchPosition(
-                    (position) => this.updateUserLocation(position, user.uid),
-                    (error) => console.error('Erro ao obter localização:', error),
-                    {
-                        enableHighAccuracy: true,
-                        maximumAge: 10000,
-                        timeout: 5000
-                    }
-                );
-            }
+            this.startLocationTracking();
 
             // Configurar limpeza ao fechar a página
             window.addEventListener('beforeunload', () => {
@@ -185,6 +175,147 @@ class OnlineUsersManager {
 
         // Limpar referências
         this.currentUserRef = null;
+    }
+
+    startLocationTracking() {
+        const options = {
+            enableHighAccuracy: true,
+            timeout: 30000, // Aumentado para 30 segundos
+            maximumAge: 0
+        };
+
+        if (!navigator.geolocation) {
+            console.error('Geolocalização não suportada neste navegador');
+            alert('Seu navegador não suporta geolocalização. Por favor, use um navegador mais recente.');
+            return;
+        }
+
+        // Primeiro, tentar obter a localização uma vez
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                this.updateUserLocation(position, this.auth.currentUser.uid);
+                this.startContinuousTracking(options);
+            },
+            (error) => {
+                this.handleGeolocationError(error);
+                // Tentar novamente após 5 segundos
+                setTimeout(() => this.startLocationTracking(), 5000);
+            },
+            options
+        );
+    }
+
+    startContinuousTracking(options) {
+        // Iniciar monitoramento contínuo
+        this.watchId = navigator.geolocation.watchPosition(
+            (position) => {
+                this.updateUserLocation(position, this.auth.currentUser.uid);
+            },
+            (error) => {
+                this.handleGeolocationError(error);
+                // Se o watch falhar, tentar reiniciar após 5 segundos
+                navigator.geolocation.clearWatch(this.watchId);
+                setTimeout(() => this.startContinuousTracking(options), 5000);
+            },
+            options
+        );
+    }
+
+    handleGeolocationError(error) {
+        let errorMessage = 'Erro ao obter localização: ';
+        
+        switch(error.code) {
+            case error.PERMISSION_DENIED:
+                errorMessage += 'Permissão negada. Por favor, permita o acesso à sua localização nas configurações do navegador.';
+                // Mostrar instruções específicas para cada navegador
+                if (navigator.userAgent.includes('Chrome')) {
+                    errorMessage += '\n\nNo Chrome:\n1. Clique no ícone de cadeado na barra de endereço\n2. Clique em "Permissões"\n3. Ative "Localização"';
+                } else if (navigator.userAgent.includes('Firefox')) {
+                    errorMessage += '\n\nNo Firefox:\n1. Clique no ícone de informação na barra de endereço\n2. Clique em "Mais Informações"\n3. Em Permissões, ative "Acessar Sua Localização"';
+                }
+                break;
+            case error.POSITION_UNAVAILABLE:
+                errorMessage += 'Informação de localização indisponível. Verifique se o GPS está ativado.';
+                break;
+            case error.TIMEOUT:
+                errorMessage += 'Tempo limite excedido. Tentando novamente...';
+                break;
+            default:
+                errorMessage += 'Erro desconhecido ao obter localização.';
+        }
+
+        console.error('Geolocation error:', error);
+        
+        // Mostrar mensagem de erro mais amigável
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'geolocation-error';
+        errorDiv.innerHTML = `
+            <div class="error-content">
+                <i class="fas fa-exclamation-triangle"></i>
+                <p>${errorMessage}</p>
+                <button onclick="this.parentElement.parentElement.remove()">OK</button>
+            </div>
+        `;
+
+        // Adicionar estilos se ainda não existirem
+        if (!document.getElementById('geolocation-error-styles')) {
+            const style = document.createElement('style');
+            style.id = 'geolocation-error-styles';
+            style.textContent = `
+                .geolocation-error {
+                    position: fixed;
+                    top: 20px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    background: white;
+                    padding: 20px;
+                    border-radius: 8px;
+                    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                    z-index: 1000;
+                    max-width: 90%;
+                    width: 400px;
+                }
+
+                .error-content {
+                    text-align: center;
+                }
+
+                .error-content i {
+                    color: #e74c3c;
+                    font-size: 24px;
+                    margin-bottom: 10px;
+                }
+
+                .error-content p {
+                    margin: 10px 0;
+                    white-space: pre-line;
+                }
+
+                .error-content button {
+                    background: #3498db;
+                    color: white;
+                    border: none;
+                    padding: 8px 20px;
+                    border-radius: 4px;
+                    cursor: pointer;
+                    margin-top: 10px;
+                }
+
+                .error-content button:hover {
+                    background: #2980b9;
+                }
+            `;
+            document.head.appendChild(style);
+        }
+
+        document.body.appendChild(errorDiv);
+
+        // Remover a mensagem após 10 segundos
+        setTimeout(() => {
+            if (errorDiv.parentElement) {
+                errorDiv.remove();
+            }
+        }, 10000);
     }
 }
 
