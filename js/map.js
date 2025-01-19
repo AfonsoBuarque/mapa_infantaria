@@ -207,6 +207,12 @@ function initMap() {
 
     // Dispara evento de inicialização do mapa
     document.dispatchEvent(new Event('map:init'));
+
+    // Após a inicialização do mapa, adicione:
+    const mapInitializedEvent = new CustomEvent('mapInitialized', { 
+        detail: { map: map }
+    });
+    document.dispatchEvent(mapInitializedEvent);
 }
 
 // Aguarda o DOM estar pronto para inicializar o mapa

@@ -18,6 +18,8 @@
     <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
     
     <script>
         // Configuração do Firebase
@@ -233,6 +235,9 @@
     <script src="js/map.js"></script>
     <script src="js/kml-import.js"></script>
     <script src="js/compass.js"></script>
+    <script src="js/online-users.js"></script>
+    <script src="js/chat.js"></script>
+    <script src="js/movement-history.js"></script>
     <script src="js/markers.js"></script>
     <script src="js/markers-list.js"></script>
     <script src="js/kml-export.js"></script>
@@ -249,6 +254,24 @@
                 window.location.href = 'index.html';
             }).catch((error) => {
                 console.error('Erro ao fazer logout:', error);
+            });
+        });
+    </script>
+
+    <script>
+        // Inicializar sistema de usuários online após o mapa ser carregado
+        document.addEventListener('mapInitialized', function(e) {
+            const onlineUsers = new OnlineUsersManager(e.detail.map);
+            const chat = new ChatManager();
+            const history = new MovementHistory(e.detail.map);
+            
+            onlineUsers.init();
+
+            // Cleanup quando a página for fechada
+            window.addEventListener('beforeunload', () => {
+                onlineUsers.cleanup();
+                chat.cleanup();
+                history.cleanup();
             });
         });
     </script>
