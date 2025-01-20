@@ -344,9 +344,6 @@ function onLocationFound(e) {
         fillOpacity: 0.15,
         weight: 1
     }).addTo(map);
-
-    // Centraliza o mapa na localização
-    map.setView(e.latlng);
 }
 
 function onLocationError(e) {
@@ -367,7 +364,7 @@ function startLocationTracking() {
     }
     
     // Primeira localização
-    map.locate({setView: true, maxZoom: 16});
+    map.locate({maxZoom: 16});
     
     // Acompanhamento contínuo
     watchId = navigator.geolocation.watchPosition(
