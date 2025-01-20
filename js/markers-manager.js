@@ -5,6 +5,20 @@ class MarkersManager {
         this.map = map;
         this.markers = new Map(); // Armazena os marcadores ativos
         this.markersUnsubscribe = null;
+        this.userColors = new Map(); // Armazena as cores para cada usuário
+        this.availableColors = [
+            '#FF5733', // Vermelho
+            '#33FF57', // Verde
+            '#3357FF', // Azul
+            '#FF33F6', // Rosa
+            '#33FFF6', // Ciano
+            '#F6FF33', // Amarelo
+            '#FF8333', // Laranja
+            '#8333FF', // Roxo
+            '#33FF9E', // Verde-água
+            '#FF3333'  // Vermelho escuro
+        ];
+        this.nextColorIndex = 0;
         this.setupUI();
         this.setupEventListeners();
         this.setupRealtimeSync();
@@ -253,13 +267,31 @@ class MarkersManager {
             });
     }
 
+    getUserColor(userId) {
+        if (!this.userColors.has(userId)) {
+            const color = this.availableColors[this.nextColorIndex % this.availableColors.length];
+            this.userColors.set(userId, color);
+            this.nextColorIndex++;
+        }
+        return this.userColors.get(userId);
+    }
+
     createMarkerOnMap(markerData) {
-        const marker = L.marker([markerData.lat, markerData.lng])
+        const userColor = this.getUserColor(markerData.createdBy);
+        const markerIcon = L.divIcon({
+            className: 'custom-marker',
+            html: `<i class="fas fa-map-marker-alt" style="color: ${userColor}; font-size: 24px;"></i>`,
+            iconSize: [24, 24],
+            iconAnchor: [12, 24],
+            popupAnchor: [0, -24]
+        });
+
+        const marker = L.marker([markerData.lat, markerData.lng], { icon: markerIcon })
             .bindPopup(`
                 <div class="marker-popup">
                     <h3>${markerData.title}</h3>
                     <p>${markerData.description}</p>
-                    <small>Criado por: ${markerData.userName}</small>
+                    <small style="color: ${userColor}">Criado por: ${markerData.userName}</small>
                 </div>
             `);
         
@@ -285,12 +317,13 @@ class MarkersManager {
         const markerElement = document.createElement('div');
         markerElement.className = 'marker-item';
         markerElement.id = `marker-${markerData.id}`;
+        const userColor = this.getUserColor(markerData.createdBy);
         
         markerElement.innerHTML = `
             <div class="marker-info">
                 <div class="marker-title">${markerData.title}</div>
                 <div class="marker-description">${markerData.description}</div>
-                <small>Criado por: ${markerData.userName}</small>
+                <small style="color: ${userColor}">Criado por: ${markerData.userName}</small>
             </div>
             <div class="marker-actions">
                 ${markerData.createdBy === this.auth.currentUser.uid ? `
