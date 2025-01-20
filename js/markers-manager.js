@@ -293,9 +293,6 @@ class MarkersManager {
                 <small>Criado por: ${markerData.userName}</small>
             </div>
             <div class="marker-actions">
-                <button class="marker-button" onclick="window.markersManager.centerOnMarker('${markerData.id}')">
-                    <i class="fas fa-crosshairs"></i>
-                </button>
                 ${markerData.createdBy === this.auth.currentUser.uid ? `
                     <button class="marker-button delete" onclick="window.markersManager.deleteMarker('${markerData.id}')">
                         <i class="fas fa-trash"></i>
@@ -316,14 +313,6 @@ class MarkersManager {
         const element = document.getElementById(`marker-${markerId}`);
         if (element) {
             element.remove();
-        }
-    }
-
-    centerOnMarker(markerId) {
-        const marker = this.markers.get(markerId);
-        if (marker) {
-            this.map.setView(marker.getLatLng(), this.map.getZoom());
-            marker.openPopup();
         }
     }
 
