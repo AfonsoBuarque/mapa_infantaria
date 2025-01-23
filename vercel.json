@@ -32,17 +32,27 @@
   ],
   "routes": [
     {
+      "src": "/(.*)\\.html",
+      "headers": {
+        "Cache-Control": "public, max-age=0, must-revalidate",
+        "X-Frame-Options": "DENY",
+        "X-Content-Type-Options": "nosniff"
+      }
+    },
+    {
       "src": "/manifest.json",
       "headers": {
         "Content-Type": "application/manifest+json",
-        "Cache-Control": "public, max-age=0, must-revalidate"
+        "Cache-Control": "public, max-age=0, must-revalidate",
+        "Access-Control-Allow-Origin": "*"
       }
     },
     {
       "src": "/sw.js",
       "headers": {
         "Content-Type": "application/javascript",
-        "Cache-Control": "public, max-age=0, must-revalidate"
+        "Cache-Control": "public, max-age=0, must-revalidate",
+        "Service-Worker-Allowed": "/"
       }
     },
     {
@@ -53,12 +63,9 @@
     },
     {
       "src": "/(.*)",
-      "dest": "/$1",
       "headers": {
-        "cache-control": "s-maxage=0",
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-        "Access-Control-Allow-Headers": "X-Requested-With, Content-Type, Accept"
+        "X-Frame-Options": "DENY",
+        "X-Content-Type-Options": "nosniff"
       }
     }
   ]

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#3498db">
+    <title>Test PWA - Infantaria</title>
+    <link rel="manifest" href="./manifest.json">
+</head>
+<body>
+    <h1>Teste PWA Infantaria</h1>
+    <p>Esta é uma página de teste para o PWA.</p>
+
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', async () => {
+                try {
+                    const registration = await navigator.serviceWorker.register('./sw.js', {
+                        scope: './'
+                    });
+                    console.log('Service Worker registrado com sucesso:', registration.scope);
+                } catch (error) {
+                    console.error('Falha ao registrar o Service Worker:', error);
+                }
+            });
+        }
+
+        // Log para verificar se o manifest está sendo carregado
+        const manifestLink = document.querySelector('link[rel="manifest"]');
+        if (manifestLink) {
+            fetch(manifestLink.href)
+                .then(response => response.json())
+                .then(manifest => {
+                    console.log('Manifest carregado:', manifest);
+                })
+                .catch(error => {
+                    console.error('Erro ao carregar manifest:', error);
+                });
+        }
+    </script>
+</body>
+</html>
